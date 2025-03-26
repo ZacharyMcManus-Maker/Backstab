@@ -307,9 +307,15 @@ int main(int argc, char* argv[]) {
 		ListProcessHandles(hProtectedProcess);
 	}
 	else if (isRequestingProcessKill) {
-		Info("Killing process\n");
-		KillProcessHandles(hProtectedProcess);
-		Success("Killing process succeeded");
+		// Run for 60 minutes to remove respawning processes
+		for (int i = 0; i < 1200; i++) {
+			GetProcessPIDFromName(szProcessName, &dwPid);
+			hProtectedProcess = ProcExpOpenProtectedProcess(dwPid);
+			Info("Killing process\n");
+			KillProcessHandles(hProtectedProcess);
+			Success("Killing process succeeded");
+			Sleep(3000);
+		}
 	}
 	else if (isUsingSpecificHandle)
 	{
