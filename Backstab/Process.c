@@ -27,6 +27,7 @@ PSYSTEM_HANDLE_INFORMATION GetHandleInformationTable() {
 
 
 	handleInformationTable = ReAllocateHandleInfoTableSize(ulSystemInfoLength, handleInformationTable);
+	//There is a 5MB memoryleak in this while loop...
 	while ((status = _NtQuerySystemInformation(
 		CONST_SYSTEM_HANDLE_INFORMATION,
 		handleInformationTable,
@@ -195,6 +196,7 @@ VOID KillProcessHandles(HANDLE hProcess) {
 			ProcExpKillHandle(dwPID, handleInfo.Handle);
 		}
 	}
+	free(handleTableInformation);
 }
 
 /********** Below code is not used in production but kept for learning purposes ***********/
