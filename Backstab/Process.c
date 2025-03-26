@@ -94,10 +94,12 @@ PVOID GetObjectAddressFromHandle(DWORD dwPID, USHORT usTargetHandle)
 		{
 			if (handleInfo.Handle == usTargetHandle)
 			{
+				free(handleTableInformation);
 				return handleInfo.Object;
 			}
 		}
 	}
+	free(handleTableInformation);
 	return NULL;
 }
 
